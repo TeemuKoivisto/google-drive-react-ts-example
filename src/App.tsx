@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react'
+import { inject } from 'mobx-react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { Stores } from './stores'
+
+interface IProps {
+  className?: string
+  isAuthenticated?: boolean
+  children: React.ReactNode
+  logout?: () => void
 }
 
-export default App;
+export const App = inject((stores: Stores) => ({
+  isAuthenticated: stores.authStore.isAuthenticated,
+  logout: stores.authStore.logout,
+}))
+((props: IProps) => {
+  const { children, isAuthenticated, logout } = props
+  useEffect(() => {
+    if (!isAuthenticated) {
+      logout!()
+    }
+  }, [])
+  return <>{children}</>
+})
